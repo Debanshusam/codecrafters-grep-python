@@ -6,6 +6,7 @@ import sys
 
 def match_pattern(input_line, pattern):
     if len(pattern) == 1:
+        print("Matching :: Single character pattern")
         return pattern in input_line
     else:
         raise RuntimeError(f"Unhandled pattern: {pattern}")
@@ -23,10 +24,10 @@ def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
     # Uncomment this block to pass the first stage
-    # if match_pattern(input_line, pattern):
-    #     exit(0)
-    # else:
-    #     exit(1)
+    if match_pattern(input_line, pattern):
+        exit(0)
+    else:
+        exit(1)
 
 
 if __name__ == "__main__":
