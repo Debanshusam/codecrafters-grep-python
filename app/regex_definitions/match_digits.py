@@ -1,15 +1,13 @@
 import unittest
 
-def match_pattern(input_line: str, pattern: str) -> bool:
-    if len(pattern) == 1 and pattern.isdigit():
-        print("Matching :: Single digit pattern")
-        return pattern in input_line
-    else:
-        raise RuntimeError(f"Unhandled pattern: {pattern}")
-
 def match_any_digit(input_line: str) -> bool:
-    print(f"Matching :: Any digit pattern in :: {input_line}")
-    return any(char.isdigit() for char in input_line)
+    
+    for char in input_line:
+        if char.isdigit():
+            print(f"Matching :: Any digit pattern in :: {input_line}, Found :: {char}")
+            return True
+    print(f"Matching :: Any digit pattern in :: {input_line}, Not Found")
+    return False
 
 class TestMatchAnyDigit(unittest.TestCase):
     def test_contains_digits(self):
@@ -23,6 +21,7 @@ class TestMatchAnyDigit(unittest.TestCase):
         self.assertFalse(match_any_digit("!@#$%^&*()"))
         self.assertFalse(match_any_digit(""))
         self.assertFalse(match_any_digit("abcdef"))
+        self.assertFalse(match_any_digit("a"))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
