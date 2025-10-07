@@ -80,8 +80,9 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
         if char not in list(single_char_pattern):
             _single_char_no_match = True
         else:
+            print(f"DEBUG Matched {char} in {input_line}, Breaking...")
             _single_char_no_match = False
-            break  # If any char matches the single char group, we can stop checking
+            return False  # If any char matches the single char group, return False
     
     # Check for ranges only if single char check passed
     if _single_char_no_match is True and range_char_pattern:
@@ -95,6 +96,7 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
                    if not (start_range <= char <= end_range):
                        _range_char_no_match = True
                    else:
+                       print(f"DEBUG Matched {start_range}-{end_range} for char {char}")
                        _range_char_no_match = False
                        _break_outer = True
                        break  # If any char matches the range, we can stop checking
@@ -113,6 +115,7 @@ class TestNegativeCharGroup(unittest.TestCase):
 
     def test_single_char_in_group(self):
         self.assertFalse(match_neg_char_group("a", "[^abc]"))  # 'a' in group
+        self.assertFalse(match_neg_char_group("apple", "[^abc]"))  # 'a' in group
         self.assertFalse(match_neg_char_group("cab", "[^abc]"))  # all in group
 
     def test_char_range_not_in_group(self):
@@ -136,9 +139,11 @@ class TestNegativeCharGroup(unittest.TestCase):
     def test_non_alpha_characters(self):
         self.assertTrue(match_neg_char_group("1", "[^a-c]"))  # '1' not in 'a-c'
         self.assertTrue(match_neg_char_group("-", "[^a-c]"))  # '-' not in 'a-c'
+        
 
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+    # print(match_neg_char_group("apple", "[^abc]"))  # Should return False since 'a' are in the group
 
 
