@@ -2,8 +2,8 @@ import sys
 
 # import pyparsing - available if you need it!
 # import lark - available if you need it!
-from regex_definitions import match_single_char
-from regex_definitions import match_digits
+from app.regex_definitions import match_single_char
+from app.regex_definitions import match_digits
 
 def match_pattern(input_line, pattern):
     if len(pattern) == 1:
