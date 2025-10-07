@@ -67,6 +67,11 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
     print(f"DEBUG {input_line=}")
     print(f"DEBUG {match_pattern=}")
 
+    if len(input_line) == 0:
+        return True  # Empty input should always match negative char group
+    elif len(single_char_pattern) == 0 and len(range_char_pattern) == 0:
+        return True  # No exclusions means everything matches
+
     # Check for single characters
     _single_char_no_match: bool = False
     _range_char_no_match: bool = False
@@ -96,6 +101,8 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
 
             if _break_outer:
                 break
+    else:
+        _range_char_no_match = True  # No ranges to check, so consider it as no match
 
     return _single_char_no_match and _range_char_no_match
 
