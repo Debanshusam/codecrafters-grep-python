@@ -1,14 +1,21 @@
 import sys
-from pyparsing import Literal, ParserElement, ParseException
-from typing import Annotated, Optional
+import pyparsing as pp 
+from pyparsing import ParserElement, ParseException
+from typing import Annotated, Optional, Literal
 
 from app.regex_definitions import match_single_char
 from app.regex_definitions import match_digits
 from app.regex_definitions import alpha_numeric
+from app.regex_definitions import positive_char_group as pcg
 
 FilterKeyType = Annotated[
     str, 
-    Literal("digit") | Literal("single_char") | Literal("alpha_numeric")
+    Literal("digit") | 
+    Literal("single_char") | 
+    Literal("alpha_numeric") |
+    # -------
+    Literal("positive_char_group")
+    # ------
     ]
 
 def parse_command_to_identify_filter_type(args) -> FilterKeyType:
@@ -18,8 +25,8 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # ---- REGEX GRAMMAR ----
     # You can extend this grammar for more regex features as needed
     filter_type_ky = args[2]
-    digit_pattern = Literal("\\d")
-    alpha_numeric_pattern = Literal("\\w")
+    digit_pattern = pp.Literal("\\d")
+    alpha_numeric_pattern = pp.Literal("\\w")
 
     # Basic validation of command structure
     if len(args) < 3:
@@ -49,6 +56,15 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     except ParseException:
         pass
 
+    # --- POSITIVE CHAR GROUP PATTERN CHECK ---
+    try:
+        # Try to parse the pattern as a positive character group pattern
+        pcg.POSITIVE_CHAR_GROUP.parseString(filter_type_ky, parse_all=True)
+        _identified_filter_type = "positive_char_group"
+    except ParseException:
+        pass
+    
+    print(f"DEBUG :: Identified filter type :: {_identified_filter_type=}", file=sys.stderr)
     return _identified_filter_type
 
 
@@ -66,6 +82,11 @@ def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[st
         # If not a digit pattern, treat as single char pattern
         if match_single_char.match_pattern(input_line, search_pattern):
             exit(0)
+
+    elif filter_key in ("positive_char_group"):
+        if pcg.match_char_group(input_line, search_pattern):
+            exit(0)
+
     else:
         raise RuntimeError(f"Unhandled filter key: {filter_key}")
 
