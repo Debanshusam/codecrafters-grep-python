@@ -1,7 +1,7 @@
 import sys
 import pyparsing as pp 
 from pyparsing import ParserElement, ParseException
-from typing import Annotated, Optional, Literal
+from typing import Annotated, Optional
 
 from app.regex_definitions import match_single_char
 from app.regex_definitions import match_digits
@@ -10,15 +10,21 @@ from app.regex_definitions import positive_char_group as pcg
 
 FilterKeyType = Annotated[
     str, 
-    Literal("digit") | 
-    Literal("single_char") | 
-    Literal("alpha_numeric") |
+    pp.Literal("digit") | 
+    pp.Literal("single_char") | 
+    pp.Literal("alpha_numeric") |
     # -------
-    Literal("positive_char_group")
+    pp.Literal("positive_char_group")
     # ------
     ]
 
 def parse_command_to_identify_filter_type(args) -> FilterKeyType:
+    """ Parses the command line arguments to identify the filter type.
+    Returns:
+        FilterKeyType: The identified filter type.
+    Raises:
+        ValueError: If the command is invalid or the filter type is unrecognized.
+    """
     # Define a simple grammar for recognizing \d (digit) or any single character pattern
     ParserElement.setDefaultWhitespaceChars('')  # Don't skip whitespace
 
