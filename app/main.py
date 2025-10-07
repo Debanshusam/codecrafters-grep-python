@@ -1,11 +1,10 @@
 import sys
+from pyparsing import Literal, ParserElement, ParseException
+from typing import Annotated, Optional
 
-# import pyparsing - available if you need it!
-# import lark - available if you need it!
 from app.regex_definitions import match_single_char
 from app.regex_definitions import match_digits
-from pyparsing import Literal, ParserElement, ParseException
-from typing import Annotated
+from app.regex_definitions import alpha_numeric
 
 FilterKeyType = Annotated[
     str, 
@@ -19,8 +18,8 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # ---- REGEX GRAMMAR ----
     # You can extend this grammar for more regex features as needed
     filter_type_ky = args[2]
-    digit_pattern = Literal(r"\d")
-    alpha_numeric_pattern = Literal(r"\w")
+    digit_pattern = Literal("\\d")
+    alpha_numeric_pattern = Literal("\\w")
 
     # Basic validation of command structure
     if len(args) < 3:
@@ -52,16 +51,16 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
 
     return _identified_filter_type
 
-def grep(filter_key: FilterKeyType, search_pattern: str, input_line: str) -> None:
+def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[str] = None) -> None:
 
     if filter_key == "digit":
         if match_digits.match_any_digit(input_line):
             exit(0)
 
     elif filter_key == "alpha_numeric":
-        if match_single_char.match_pattern(input_line, search_pattern):
+        if alpha_numeric.match_alphanum(input_line):
             exit(0)
-            
+
     elif filter_key == "single_char":
         # If not a digit pattern, treat as single char pattern
         if match_single_char.match_pattern(input_line, search_pattern):
