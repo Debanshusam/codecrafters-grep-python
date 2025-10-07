@@ -7,6 +7,7 @@ from app.regex_definitions import match_single_char
 from app.regex_definitions import match_digits
 from app.regex_definitions import alpha_numeric
 from app.regex_definitions import positive_char_group as pcg
+from app.regex_definitions import negative_char_group as ncg
 
 FilterKeyType = Annotated[
     str, 
@@ -15,6 +16,7 @@ FilterKeyType = Annotated[
     pp.Literal("alpha_numeric") |
     # -------
     pp.Literal("positive_char_group")
+    pp.Literal("negative_char_group")
     # ------
     ]
 
@@ -69,6 +71,14 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
         _identified_filter_type = "positive_char_group"
     except ParseException:
         pass
+
+    # --- NEGATIVE CHAR GROUP PATTERN CHECK ---
+    try:
+        # Try to parse the pattern as a negative character group pattern
+        ncg.NEGATIVE_CHAR_GROUP.parseString(filter_type_ky, parse_all=True)
+        _identified_filter_type = "negative_char_group"
+    except ParseException:
+        pass
     
     print(f"DEBUG :: Identified filter type :: {_identified_filter_type=}", file=sys.stderr)
     return _identified_filter_type
@@ -91,6 +101,10 @@ def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[st
 
     elif filter_key in ("positive_char_group"):
         if pcg.match_char_group(input_line, search_pattern):
+            exit(0)
+    
+    elif filter_key in ("negative_char_group"):
+        if ncg.match_neg_char_group(input_line, search_pattern):
             exit(0)
 
     else:
