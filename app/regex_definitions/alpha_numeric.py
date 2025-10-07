@@ -1,16 +1,18 @@
 import unittest
 
 def match_alphanum(input_line: str) -> bool:
-    is_alpha_numeric: bool = False
+    """ Check if the input_line consists any of alphanumeric characters.
+    An alphanumeric character is either a letter (a-z, A-Z) or a digit (0-9).
+    
+    NOTE: Additionally Match undrscore (_) as alphanumeric to align with \w regex behavior.
+    """
     for char in input_line:
-        if char.isalnum():
+        if char.isalnum() or char == '_':  # Including underscore as alphanumeric
             # print(f"Matching :: Any alphanumeric pattern in :: {input_line}, Found :: {char}")
-            is_alpha_numeric = True
-        else:
-            print(f"Not Matching :: Any alphanumeric pattern in :: {input_line}")
-            return False
+            return True
+        
     print(f"Matching :: alphanumeric pattern in :: {input_line}")
-    return is_alpha_numeric
+    return False
 
 class TestAlphaNumeric(unittest.TestCase):
     def test_all_alphanumeric(self):
@@ -23,15 +25,19 @@ class TestAlphaNumeric(unittest.TestCase):
         self.assertTrue(match_alphanum("abcdef"))
 
     def test_with_special_characters(self):
-        self.assertFalse(match_alphanum("abc123!@#"))
-        self.assertFalse(match_alphanum("$!"))
-        self.assertFalse(match_alphanum("÷×=_=+÷"))
+        self.assertTrue(match_alphanum("abc123!@#"))
+        self.assertFalse(match_alphanum("$!?"))
+    
+    def test_with_underscore(self):
+        self.assertTrue(match_alphanum("÷×=_=+÷"))
+        self.assertTrue(match_alphanum("___"))
+        self.assertTrue(match_alphanum("_"))
 
     def test_empty_string(self):
         self.assertFalse(match_alphanum(""))
 
     def test_with_spaces(self):
-        self.assertFalse(match_alphanum("abc 123"))
+        self.assertTrue(match_alphanum("abc 123"))
 
     def test_single_alphanumeric(self):
         self.assertTrue(match_alphanum("a"))
@@ -41,4 +47,4 @@ class TestAlphaNumeric(unittest.TestCase):
         self.assertFalse(match_alphanum("!"))
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
