@@ -7,16 +7,20 @@ from app.regex_definitions import match_digits
 from pyparsing import Literal, ParserElement, ParseException
 from typing import Annotated
 
-FilterKeyType = Annotated[str, Literal("digit") | Literal("single_char")]
+FilterKeyType = Annotated[
+    str, 
+    Literal("digit") | Literal("single_char") | Literal("alpha_numeric")
+    ]
 
 def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # Define a simple grammar for recognizing \d (digit) or any single character pattern
     ParserElement.setDefaultWhitespaceChars('')  # Don't skip whitespace
 
-    # REGEX GRAMMAR
+    # ---- REGEX GRAMMAR ----
     # You can extend this grammar for more regex features as needed
     filter_type_ky = args[2]
     digit_pattern = Literal(r"\d")
+    alpha_numeric_pattern = Literal(r"\w")
 
     # Basic validation of command structure
     if len(args) < 3:
@@ -28,19 +32,36 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
         raise ValueError("Expected first argument to be '-E'")
 
     # Filter type identification
+    _identified_filter_type: FilterKeyType = "single_char"  # Default to single_char
+    
+    # --- DIGIT PATTERN CHECK ---
     try:
         # Try to parse the pattern as a digit pattern
         digit_pattern.parseString(filter_type_ky, parse_all=True)
-        return "digit"
+        _identified_filter_type = "digit"
     except ParseException:
-        return "single_char"
+        pass
+    
+    # --- ALPHA NUMERIC PATTERN CHECK ---
+    try:
+        # Try to parse the pattern as a single character pattern
+        alpha_numeric_pattern.parseString(filter_type_ky, parse_all=True)
+        _identified_filter_type = "alpha_numeric"
+    except ParseException:
+        pass
 
-def grep(filter_key: FilterKeyType, search_pattern: str, input_line: str):
+    return _identified_filter_type
+
+def grep(filter_key: FilterKeyType, search_pattern: str, input_line: str) -> None:
 
     if filter_key == "digit":
         if match_digits.match_any_digit(input_line):
             exit(0)
 
+    elif filter_key == "alpha_numeric":
+        if match_single_char.match_pattern(input_line, search_pattern):
+            exit(0)
+            
     elif filter_key == "single_char":
         # If not a digit pattern, treat as single char pattern
         if match_single_char.match_pattern(input_line, search_pattern):
