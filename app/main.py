@@ -15,7 +15,7 @@ FilterKeyType = Annotated[
     pp.Literal("single_char") | 
     pp.Literal("alpha_numeric") |
     # -------
-    pp.Literal("positive_char_group")
+    pp.Literal("positive_char_group") |
     pp.Literal("negative_char_group")
     # ------
     ]
