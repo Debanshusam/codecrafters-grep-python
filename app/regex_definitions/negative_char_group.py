@@ -73,40 +73,41 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
         return True  # No exclusions means everything matches
 
     # Check for single characters
-    _single_char_no_match: bool = False
-    _range_char_no_match: bool = False
+    _single_chars_match_ctr={"matched": 0, "not_matched": 0, "total": len(input_line)} 
+
+    # Expanding range patterns to individual characters for easier checking
+    _expanded_single_char_pattern = list()
+    for each_range in range_char_pattern:
+        if (
+            not isinstance(each_range, list) 
+            and 
+            len(each_range) < 3
+        ):
+            raise ValueError(f"Invalid range parsed: {each_range}")
+        else:
+            _expanded_single_char_pattern.extend(
+                [chr(c) for c in range(ord(each_range[0]), ord(each_range[-1]) + 1)]
+            )
+    # Extending the single_char_pattern with expanded range characters and remove duplicated characters
+    _expanded_single_char_pattern.extend(set(single_char_pattern))
+    _expanded_single_char_pattern_dict = {char: False for char in _expanded_single_char_pattern}
     for char in input_line:
         print(f"DEBUG Checking char {char} in {input_line}")
-        if char not in list(single_char_pattern):
-            _single_char_no_match = True
+        if char in _expanded_single_char_pattern_dict:
+            _expanded_single_char_pattern_dict[char] = True
+            _single_chars_match_ctr["matched"] += 1
         else:
-            print(f"DEBUG Matched {char} in {input_line}, Breaking...")
-            _single_char_no_match = False
-            return False  # If any char matches the single char group, return False
-    
-    # Check for ranges only if single char check passed
-    if _single_char_no_match is True and range_char_pattern:
-        _break_outer = False
-        for char in input_line:
-            # Check for ranges
-            for each_range in range_char_pattern:
-               if not _break_outer:
-                   start_range, end_range = each_range[0], each_range[-1]
-                   print(f"DEBUG Checking range {start_range}-{end_range} for char {char}")
-                   if not (start_range <= char <= end_range):
-                       _range_char_no_match = True
-                   else:
-                       print(f"DEBUG Matched {start_range}-{end_range} for char {char}")
-                       _range_char_no_match = False
-                       _break_outer = True
-                       break  # If any char matches the range, we can stop checking
+            _single_chars_match_ctr["not_matched"] += 1
 
-            if _break_outer:
-                break
+    print(f"DEBUG _single_chars_match_ctr :: {_single_chars_match_ctr}")
+    print(f"DEBUG _expanded_single_char_pattern_dict :: {_expanded_single_char_pattern_dict}")
+
+    if False not in _expanded_single_char_pattern_dict.values():
+        # All characters in input_line are found in the negative char group pattern
+        return False
     else:
-        _range_char_no_match = True  # No ranges to check, so consider it as no match
-
-    return _single_char_no_match and _range_char_no_match
+        # At least one character in input_line is not found in the negative char group pattern
+        return True
 
 class TestNegativeCharGroup(unittest.TestCase):
     def test_single_char_not_in_group(self):
