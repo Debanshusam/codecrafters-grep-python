@@ -75,14 +75,28 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
         if char not in list(single_char_pattern):
             _single_char_no_match = True
         else:
-            # Check for ranges
-            if range_char_pattern:
-                for each_range in range_char_pattern:
-                    start_range, end_range = each_range[0], each_range[-1]
-                    print(f"DEBUG Checking range {start_range}-{end_range} for char {char}")
-                    if not (start_range <= char <= end_range):
-                        _range_char_no_match = True
+            _single_char_no_match = False
+            break  # If any char matches the single char group, we can stop checking
     
+    # Check for ranges only if single char check passed
+    if _single_char_no_match is True and range_char_pattern:
+        _break_outer = False
+        for char in input_line:
+            # Check for ranges
+            for each_range in range_char_pattern:
+               if not _break_outer:
+                   start_range, end_range = each_range[0], each_range[-1]
+                   print(f"DEBUG Checking range {start_range}-{end_range} for char {char}")
+                   if not (start_range <= char <= end_range):
+                       _range_char_no_match = True
+                   else:
+                       _range_char_no_match = False
+                       _break_outer = True
+                       break  # If any char matches the range, we can stop checking
+
+            if _break_outer:
+                break
+
     return _single_char_no_match and _range_char_no_match
 
 class TestNegativeCharGroup(unittest.TestCase):
