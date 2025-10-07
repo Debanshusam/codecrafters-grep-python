@@ -51,12 +51,13 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
 
     return _identified_filter_type
 
+
 def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[str] = None) -> None:
 
     if filter_key == "digit":
         if match_digits.match_any_digit(input_line):
             exit(0)
-
+ 
     elif filter_key == "alpha_numeric":
         if alpha_numeric.match_alphanum(input_line):
             exit(0)
@@ -65,6 +66,13 @@ def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[st
         # If not a digit pattern, treat as single char pattern
         if match_single_char.match_pattern(input_line, search_pattern):
             exit(0)
+    else:
+        raise RuntimeError(f"Unhandled filter key: {filter_key}")
+
+    # if not matched
+    print(f"No match found :: {input_line=}, {search_pattern=}, {filter_key=}", file=sys.stderr)
+    exit(1)
+
 
 def main() -> None:
     # You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -80,9 +88,6 @@ def main() -> None:
         search_pattern=sys.argv[2], 
         input_line=sys.stdin.read()
         )
-
-    
-    exit(1)
 
 
 if __name__ == "__main__":

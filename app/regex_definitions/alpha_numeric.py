@@ -25,6 +25,7 @@ class TestAlphaNumeric(unittest.TestCase):
     def test_with_special_characters(self):
         self.assertFalse(match_alphanum("abc123!@#"))
         self.assertFalse(match_alphanum("$!"))
+        self.assertFalse(match_alphanum("÷×=_=+÷"))
 
     def test_empty_string(self):
         self.assertFalse(match_alphanum(""))
