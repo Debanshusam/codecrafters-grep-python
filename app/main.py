@@ -20,6 +20,9 @@ FilterKeyType = Annotated[
     # ------
     ]
 
+def char_by_char_parsing():
+    pass
+
 def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     """ Parses the command line arguments to identify the filter type.
     Returns:
@@ -33,8 +36,6 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # ---- REGEX GRAMMAR ----
     # You can extend this grammar for more regex features as needed
     filter_type_ky = args[2]
-    digit_pattern = pp.Literal("\\d")
-    alpha_numeric_pattern = pp.Literal("\\w")
 
     # Basic validation of command structure
     if len(args) < 3:
@@ -51,7 +52,7 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # --- DIGIT PATTERN CHECK ---
     try:
         # Try to parse the pattern as a digit pattern
-        digit_pattern.parseString(filter_type_ky, parse_all=True)
+        match_digits.DIGIT_PATTERN.parseString(filter_type_ky, parse_all=True)
         _identified_filter_type = "digit"
     except ParseException:
         pass
@@ -59,7 +60,7 @@ def parse_command_to_identify_filter_type(args) -> FilterKeyType:
     # --- ALPHA NUMERIC PATTERN CHECK ---
     try:
         # Try to parse the pattern as a single character pattern
-        alpha_numeric_pattern.parseString(filter_type_ky, parse_all=True)
+        alpha_numeric.ALPHA_NUMERIC_PATTERN.parseString(filter_type_ky, parse_all=True)
         _identified_filter_type = "alpha_numeric"
     except ParseException:
         pass

@@ -1,4 +1,8 @@
 import unittest
+import pyparsing as pp
+
+ALPHA_NUMERIC_PATTERN = pp.Literal("\\w")
+
 
 def match_alphanum(input_line: str) -> bool:
     """ Check if the input_line consists any of alphanumeric characters.

@@ -1,4 +1,7 @@
 import unittest
+import pyparsing as pp
+
+DIGIT_PATTERN = pp.Literal("\\d")
 
 def match_any_digit(input_line: str) -> bool:
     
