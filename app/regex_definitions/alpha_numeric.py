@@ -1,5 +1,7 @@
 import unittest
 import pyparsing as pp
+import logging
+logger = logging.getLogger(__name__)
 
 ALPHA_NUMERIC_PATTERN = pp.Literal("\\w")
 
@@ -12,10 +14,10 @@ def match_alphanum(input_line: str) -> bool:
     """
     for char in input_line:
         if char.isalnum() or char == '_':  # Including underscore as alphanumeric
-            # print(f"Matching :: Any alphanumeric pattern in :: {input_line}, Found :: {char}")
+            logger.debug(f"Matching :: Any alphanumeric pattern in :: {input_line}, Found :: {char}")
             return True
         
-    print(f"Matching :: alphanumeric pattern in :: {input_line}")
+    logger.info(f"Matching :: alphanumeric pattern in :: {input_line}")
     return False
 
 class TestAlphaNumeric(unittest.TestCase):

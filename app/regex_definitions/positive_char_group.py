@@ -2,6 +2,9 @@ import unittest
 import pyparsing as pp 
 from pyparsing import ParserElement, ParseException
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Matches a single character
 SINGLE_CHAR = pp.Word(pp.alphas, exact=1).set_results_name("single_char", list_all_matches=True)
 
@@ -26,9 +29,8 @@ POSITIVE_CHAR_GROUP = (
 def _extract_groups(pattern):
     try:
         result = POSITIVE_CHAR_GROUP.parse_string(pattern)
-        print(f"DEBUG {result.dump()=}")
-        print(f"DEBUG singles :: {result.single_char if hasattr(result, 'single_char') else 'N/A'}")
-        # print(f"DEBUG ranges :: {result.char_range if hasattr(result, 'char_range') else 'N/A'}")
+        logger.debug(f"DEBUG {result.dump()=}")
+        logger.debug(f"DEBUG singles :: {result.single_char if hasattr(result, 'single_char') else 'N/A'}")
 
         singles = result.single_char if hasattr(result, "single_char") else []
 
@@ -44,11 +46,11 @@ def _extract_groups(pattern):
                     raise ValueError(f"Invalid range parsed: {each_range}")
                 formatted_ranges.append((each_range[0], each_range[-1]))
         
-        print(f"DEBUG formatted_ranges :: {formatted_ranges}")
+        logger.debug(f"DEBUG formatted_ranges :: {formatted_ranges}")
 
         return singles, formatted_ranges
     except pp.ParseException as e:
-        print(f"Parse error: {e}")
+        # logger.warning(f"Parse error: {e}")
         return [], []
 
 
@@ -56,12 +58,12 @@ def match_char_group(input_line: str, match_pattern: str) -> bool:
     """ Check if the input_line consists any of characters in match_pattern.
     """
     single_char_pattern, range_char_pattern = _extract_groups(match_pattern)
-    print(f"DEBUG {input_line=}")
-    print(f"DEBUG {match_pattern=}")
+    logger.debug(f"DEBUG {input_line=}")
+    logger.debug(f"DEBUG {match_pattern=}")
 
     # Check for single characters
     for char in input_line:
-        print(f"DEBUG Checking char {char} in {input_line}")
+        logger.debug(f"DEBUG Checking char {char} in {input_line}")
         if char in list(single_char_pattern):
             return True
         else:
@@ -69,7 +71,7 @@ def match_char_group(input_line: str, match_pattern: str) -> bool:
             if range_char_pattern:
                 for each_range in range_char_pattern:
                     start_range, end_range = each_range[0], each_range[-1]
-                    print(f"DEBUG Checking range {start_range}-{end_range} for char {char}")
+                    logger.debug(f"DEBUG Checking range {start_range}-{end_range} for char {char}")
                     if start_range <= char <= end_range:
                         return True
     
@@ -119,6 +121,4 @@ class TestPositiveCharGroup(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
-    # print(match_char_group("xyz", "[x]"))
-    # print(match_char_group("a", "[a]"))
 

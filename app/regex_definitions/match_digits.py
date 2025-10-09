@@ -1,5 +1,7 @@
 import unittest
 import pyparsing as pp
+import logging
+logger = logging.getLogger(__name__)
 
 DIGIT_PATTERN = pp.Literal("\\d")
 
@@ -7,9 +9,9 @@ def match_any_digit(input_line: str) -> bool:
     
     for char in input_line:
         if char.isdigit():
-            print(f"Matching :: Any digit pattern in :: {input_line}, Found :: {char}")
+            logger.debug(f"Matching :: Any digit pattern in :: {input_line}, Found :: {char}")
             return True
-    print(f"Matching :: Any digit pattern in :: {input_line}, Not Found")
+    logger.info(f"Matching :: Any digit pattern in :: {input_line}, Not Found")
     return False
 
 class TestMatchAnyDigit(unittest.TestCase):

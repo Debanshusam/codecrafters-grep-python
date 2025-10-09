@@ -1,6 +1,8 @@
 import unittest
 import pyparsing as pp 
 from pyparsing import ParserElement, ParseException
+import logging
+logger = logging.getLogger(__name__)
 
 # Matches a single character
 SINGLE_CHAR = pp.Word(pp.alphas, exact=1).set_results_name("single_char", list_all_matches=True)
@@ -27,9 +29,8 @@ NEGATIVE_CHAR_GROUP = (
 def _extract_groups(pattern):
     try:
         result = NEGATIVE_CHAR_GROUP.parse_string(pattern)
-        print(f"DEBUG {result.dump()=}")
-        print(f"DEBUG singles :: {result.single_char if hasattr(result, 'single_char') else 'N/A'}")
-        # print(f"DEBUG ranges :: {result.char_range if hasattr(result, 'char_range') else 'N/A'}")
+        logger.debug(f"DEBUG {result.dump()=}")
+        logger.debug(f"DEBUG singles :: {result.single_char if hasattr(result, 'single_char') else 'N/A'}")
 
         singles = result.single_char if hasattr(result, "single_char") else []
 
@@ -45,11 +46,11 @@ def _extract_groups(pattern):
                     raise ValueError(f"Invalid range parsed: {each_range}")
                 formatted_ranges.append((each_range[0], each_range[-1]))
         
-        print(f"DEBUG formatted_ranges :: {formatted_ranges}")
+        logger.debug(f"DEBUG formatted_ranges :: {formatted_ranges}")
 
         return singles, formatted_ranges
     except pp.ParseException as e:
-        print(f"Parse error: {e}")
+        logger.exception(f"Parse error: {e}")
         return [], []
 
 
@@ -64,8 +65,8 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
     [^abc] should not match "cab", since all characters are in the set.
     """
     single_char_pattern, range_char_pattern = _extract_groups(match_pattern)
-    print(f"DEBUG {input_line=}")
-    print(f"DEBUG {match_pattern=}")
+    logger.debug(f"DEBUG {input_line=}")
+    logger.debug(f"DEBUG {match_pattern=}")
 
     if len(input_line) == 0:
         return True  # Empty input should always match negative char group
@@ -92,15 +93,15 @@ def match_neg_char_group(input_line: str, match_pattern: str) -> bool:
     _expanded_single_char_pattern.extend(set(single_char_pattern))
     _expanded_single_char_pattern_dict = {char: False for char in _expanded_single_char_pattern}
     for char in input_line:
-        print(f"DEBUG Checking char {char} in {input_line}")
+        logger.debug(f"DEBUG Checking char {char} in {input_line}")
         if char in _expanded_single_char_pattern_dict:
             _expanded_single_char_pattern_dict[char] = True
             _single_chars_match_ctr["matched"] += 1
         else:
             _single_chars_match_ctr["not_matched"] += 1
 
-    print(f"DEBUG _single_chars_match_ctr :: {_single_chars_match_ctr}")
-    print(f"DEBUG _expanded_single_char_pattern_dict :: {_expanded_single_char_pattern_dict}")
+    logger.debug(f"DEBUG _single_chars_match_ctr :: {_single_chars_match_ctr}")
+    logger.debug(f"DEBUG _expanded_single_char_pattern_dict :: {_expanded_single_char_pattern_dict}")
 
     if False not in _expanded_single_char_pattern_dict.values():
         # All characters in input_line are found in the negative char group pattern
@@ -145,6 +146,5 @@ class TestNegativeCharGroup(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
-    # print(match_neg_char_group("apple", "[^abc]"))  # Should return False since 'a' are in the group
 
 
