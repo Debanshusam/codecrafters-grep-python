@@ -1,13 +1,20 @@
 import unittest
+import pyparsing as pp
 import logging
+from pyparsing import Char, ParseException
+
 logger = logging.getLogger(__name__)
 
-def match_pattern(input_line: str, pattern: str) -> bool:
-    if len(pattern) == 1:
-        logger.info("Matching :: Single character pattern")
-        return pattern in input_line
-    else:
-        raise RuntimeError(f"Unhandled pattern: {pattern}")
+# Match any single character
+ANY_CHAR = Char(" ")
+
+def match_pattern(input_char: str) -> bool:
+    try:
+        ANY_CHAR.parseString(input_char, parse_all=True)
+        logger.info("Matching :: Single character pattern :: {input_char}, Found")
+        return True    
+    except ParseException:
+        return False
     
 class TestMatchSingleChar(unittest.TestCase):
 

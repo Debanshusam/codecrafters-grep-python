@@ -2,6 +2,7 @@ import pyparsing as pp
 from pyparsing import ParserElement, ParseException
 from typing import Annotated
 import logging
+from typing import Literal
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,8 @@ FilterKeyType = Annotated[
     pp.Literal("alpha_numeric") |
     # -------
     pp.Literal("positive_char_group") |
-    pp.Literal("negative_char_group")
+    pp.Literal("negative_char_group") |
     # ------
+    Literal["unknown"]
     ]
 

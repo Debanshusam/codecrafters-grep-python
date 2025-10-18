@@ -5,7 +5,7 @@ import logging
 
 from inp_parser.types import FilterKeyType
 from app.regex_definitions import match_single_char
-from app.regex_definitions import match_digits
+from app.regex_definitions import single_digit
 from app.regex_definitions import alpha_numeric
 from app.regex_definitions import positive_char_group as pcg
 from app.regex_definitions import negative_char_group as ncg
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[str] = None) -> None:
 
     if filter_key == "digit":
-        if match_digits.match_any_digit(input_line):
+        if single_digit.match_any_digit(input_line):
             exit(0)
  
     elif filter_key == "alpha_numeric":
@@ -39,5 +39,5 @@ def grep(filter_key: FilterKeyType, input_line: str, search_pattern: Optional[st
         raise RuntimeError(f"Unhandled filter key: {filter_key}")
 
     # if not matched
-    logger.info(f"No match found :: {input_line=}, {search_pattern=}, {filter_key=}", file=sys.stderr)
+    logger.info(f"No match found :: {input_line=}, {search_pattern=}, {filter_key=}")
     exit(1)
